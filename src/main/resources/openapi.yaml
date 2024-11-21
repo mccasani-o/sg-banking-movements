@@ -1,0 +1,184 @@
+openapi: 3.0.3
+info:
+  title: Sistema de Gestión Bancaria
+  description: API para gestionar movementos bancarios.
+  version: 1.0.0
+tags:
+  - name: movements
+    description: All about your movement information
+    externalDocs:
+      description: Find out more
+      url: http://swagger.
+servers:
+  - url: http://localhost:8080/api/v1
+paths:
+  /movements:
+    get:
+      tags:
+        - movements
+      summary: Get list of all movements
+      responses:
+        '200':
+          description: Movement List
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovementResponse'
+        '500':
+          description: Server error
+    post:
+      tags:
+        - movements
+      summary: Create a new movement
+      requestBody:
+        description: Data to create the movement
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovementRequest'
+      responses:
+        '201':
+          description: movement created
+
+
+  /movements/{id}:
+    get:
+      tags:
+        - movements
+      summary: Get a movement by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: movement found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovementResponse'
+        '404':
+          description: movement not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+
+    put:
+      tags:
+        - movements
+      summary: Update a movement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Data to update the movement
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MovementRequest'
+      responses:
+        '202':
+          description: Updated Movement
+
+        '404':
+          description: movement not found
+
+    delete:
+      tags:
+        - movements
+      summary: Delete a movement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted movement
+
+
+components:
+  schemas:
+    MovementResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: unique id
+        movementType:
+          type: string
+          description: Tipo de movemento (Depósito, Retiro, Pago, etc.)
+
+        amount:
+          type: number
+          format: double
+          description: Monto
+        date:
+          type: string
+          description: Fecha de movimiento
+        product:
+          $ref: '#/components/schemas/ProductResponse'
+
+
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: unique id
+        productType:
+          type: string
+          description: Tipo de producto (AHORRO, CORRIENTE, PLAZO_FIJO)
+
+        balance:
+          type: number
+          format: double
+          description: Saldo
+        limitMnthlyMovements:
+          type: integer
+          description: Límite de movimientos mensuales para cuentas de ahorro
+        dayMovement:
+          type: integer
+          description: Día de movimiento para cuentas a plazo fijo
+        customerId:
+          type: string
+          description: unique id
+    MovementRequest:
+      type: object
+      properties:
+        movementType:
+          type: string
+          description: Tipo de movemento (Depósito, Retiro, Pago, etc.)
+
+        amount:
+          type: number
+          format: double
+          description: Monto
+        date:
+          type: string
+          description: Fecha de movimiento
+        productId:
+          type: string
+          description: Id producto
+    ApiErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Code Error
+        message:
+          type: string
+          description: Message  
+        
+    
