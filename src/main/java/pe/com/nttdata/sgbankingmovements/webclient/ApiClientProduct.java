@@ -22,7 +22,6 @@ public class ApiClientProduct {
     public Mono<ProductResponse> findByProductId(String id) {
         return this.webClient.get()
                 .uri("/products/{id}", id)
-
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response -> {
                     log.error("Client not found for ID: {}", id);
