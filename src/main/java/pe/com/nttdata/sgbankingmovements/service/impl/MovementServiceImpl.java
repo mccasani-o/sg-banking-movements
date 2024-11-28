@@ -39,12 +39,20 @@ public class MovementServiceImpl implements MovementService {
     @Override
     public Flux<MovementResponse> getAll() {
         return this.movementRepository.findAll()
-                .switchIfEmpty(Mono.error(new RuntimeException("No se encontraron productos")))
-                .flatMap(movement -> this.findByProductId(movement.getProductId())
-                        .map(productResponse -> this.toMovementResponse(movement, productResponse))
-                );
+                .map(movement -> toMovementResp(movement));
+
     }
 
+    private MovementResponse toMovementResp(Movement movement) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        MovementResponse movementResponse=new MovementResponse();
+        movementResponse.setId(movement.getId());
+        movementResponse.setMovementType(movement.getMovementType());
+        movementResponse.setAmount(movement.getAmount());
+        movementResponse.setDate(movement.getDate().format(formatter));
+        return movementResponse;
+    }
 
 
     @Override
@@ -89,7 +97,7 @@ public class MovementServiceImpl implements MovementService {
 
     private Movement toMovement(MovementRequest movementRequest, ProductResponse productResponse) {
         return Movement.builder()
-                .movementType(movementRequest.getMovementType())
+                .movementType(movementRequest.getMovementType().getValue())
                 .amount(movementRequest.getAmount())
                 .date(LocalDateTime.now())
                 .productId(productResponse.getId())
@@ -99,7 +107,7 @@ public class MovementServiceImpl implements MovementService {
     private Movement toMovementUpdate(MovementRequest movementRequest, Movement movement) {
         Movement movementResponse=new Movement();
         movementResponse.setId(movement.getId());
-        movementResponse.setMovementType(movementRequest.getMovementType());
+        movementResponse.setMovementType(movementRequest.getMovementType().getValue());
         movementResponse.setAmount(movementRequest.getAmount());
         movementResponse.setDate(movement.getDate());
         movementResponse.setProductId(movementRequest.getProductId());

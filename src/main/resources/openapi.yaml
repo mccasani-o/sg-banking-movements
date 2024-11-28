@@ -160,6 +160,11 @@ components:
         movementType:
           type: string
           description: Tipo de movemento (Depósito, Retiro, Pago, etc.)
+          enum:
+            - DEPOSITO
+            - RETIRO
+            - PAGO
+            - CONSUMO
 
         amount:
           type: number

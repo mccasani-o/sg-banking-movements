@@ -2,6 +2,7 @@ package pe.com.nttdata.sgbankingmovements.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import pe.com.nttdata.sgbankingmovements.exception.CustomerException;
 import pe.com.nttdata.sgbankingmovements.model.MovementRequest;
 import pe.com.nttdata.sgbankingmovements.model.MovementResponse;
 import pe.com.nttdata.sgbankingmovements.service.MovementService;
@@ -25,8 +26,10 @@ public class MovementController {
     }
 
     @GetMapping
-    Flux<MovementResponse> getAll() {
-        return this.movementService.getAll();
+    public Flux<MovementResponse> getAll() {
+        return this.movementService.getAll()
+                .switchIfEmpty(Mono.error(new CustomerException("No se encontró lista de movimiemientos ", "204", HttpStatus.OK)))
+                .doOnNext(movementResponse -> System.out.println(movementResponse));
     }
 
     @GetMapping("/{id}")
@@ -38,17 +41,19 @@ public class MovementController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Mono<Void> update(@PathVariable String id, @RequestBody MovementRequest request) {
-        return this.movementService.update(id, request);
+    public Mono<Void> movementsIdPut(@PathVariable String operationId, @RequestBody MovementRequest request) {
+        return this.movementService.update(operationId, request);
 
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{operationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public Mono<Void> delete(@PathVariable String id) {
-        return this.movementService.delete(id);
+    public Mono<Void> movementsIdDelete(@PathVariable String operationId) {
+        return this.movementService.delete(operationId);
     }
+
+
 
 
 }
