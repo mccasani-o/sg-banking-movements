@@ -42,7 +42,7 @@ public class MovementServiceImpl implements MovementService {
     @Override
     public Flux<MovementResponse> getAll() {
         return this.movementRepository.findAll()
-                .switchIfEmpty(Mono.error(new CustomerException("No se encontró lista de movimiemientos ", "204", HttpStatus.OK)))
+                .switchIfEmpty(Mono.error(new CustomerException("No se encontró lista de movimiemientos ", "200", HttpStatus.OK)))
                 .flatMap(movement -> this.findByProductId(movement.getProductId()).map(productResponse -> this.movementsMapper.toMovementResponse(movement, productResponse)));
 
     }

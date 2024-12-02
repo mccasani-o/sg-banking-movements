@@ -9,6 +9,11 @@ tags:
     externalDocs:
       description: Find out more
       url: http://swagger.
+  - name: account-operation
+    description: Operaciones Bancarias Comunes
+    externalDocs:
+      description: Find out more
+      url: http://swagger.
 servers:
   - url: http://localhost:8080/api/v1
 paths:
@@ -106,6 +111,53 @@ paths:
       responses:
         '204':
           description: Deleted movement
+  /banking-operation/deposit:
+    post:
+      tags:
+        - account-operation
+      summary: deposit
+      requestBody:
+        description: Data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositRequest'
+      responses:
+        '200':
+          description: Successful transaction
+  /banking-operation/withdrawal:
+    post:
+      tags:
+        - account-operation
+      summary: Withdrawal
+      requestBody:
+        description: Data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawalRequest'
+      responses:
+        '200':
+          description: Successful transaction
+  /banking-operation/check-balance/{productId}:
+    get:
+      tags:
+        - account-operation
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
 
 
 components:
@@ -176,6 +228,32 @@ components:
         productId:
           type: string
           description: Id producto
+    DepositRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product Id
+        amount:
+          type: number
+          description: Amount
+    WithdrawalRequest:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Product id
+        amount:
+          type: number
+          description: Amount
+    BalanceResponse:
+      type: object
+      properties:
+        balance:
+          type: number
+          description: Balance
+
+
     ApiErrorResponse:
       type: object
       properties:
