@@ -8,11 +8,11 @@ import pe.com.nttdata.sgbankingmovements.exception.CustomerException;
 import pe.com.nttdata.sgbankingmovements.model.BalanceResponse;
 import pe.com.nttdata.sgbankingmovements.model.MovementRequest;
 import pe.com.nttdata.sgbankingmovements.model.MovementRequest.MovementTypeEnum;
-import pe.com.nttdata.sgbankingmovements.model.ProductResponse;
 import pe.com.nttdata.sgbankingmovements.service.BankingOperations;
 import pe.com.nttdata.sgbankingmovements.service.MovementService;
 import pe.com.nttdata.sgbankingmovements.util.DateUtils;
 import pe.com.nttdata.sgbankingmovements.webclient.ApiClientProduct;
+import pe.com.nttdata.sgbankingmovements.webclient.model.ProductDto;
 import pe.com.nttdata.sgbankingmovements.webclient.model.ProductRequest;
 import reactor.core.publisher.Mono;
 
@@ -29,9 +29,9 @@ public class BankAccountServiceImpl implements BankingOperations {
     @Override
     public Mono<Void> deposit(String productId, double amount) {
         return this.clientProduct.findByProductId(productId)
-                .flatMap(productResponse ->
-                        this.clientProduct.updateProduct(this.buildProductRequestDeposit(productResponse, amount))
-                                .then(this.movementService.insert(buildMovementRequest(productResponse, amount, MovementTypeEnum.DEPOSITO))));
+                .flatMap(productDto ->
+                        this.clientProduct.updateProduct(this.buildProductRequestDeposit(productDto, amount))
+                                .then(this.movementService.insert(buildMovementRequest(productDto, amount, MovementTypeEnum.DEPOSITO))));
 
     }
 
@@ -61,7 +61,7 @@ public class BankAccountServiceImpl implements BankingOperations {
     }
 
 
-    private MovementRequest buildMovementRequest(ProductResponse productResponse, double amount, MovementTypeEnum movementTypeEnum) {
+    private MovementRequest buildMovementRequest(ProductDto productResponse, double amount, MovementTypeEnum movementTypeEnum) {
         MovementRequest movementRequest = new MovementRequest();
         movementRequest.setMovementType(movementTypeEnum);
         movementRequest.setDate(DateUtils.getCurrentDateTimeAsString());
@@ -70,7 +70,7 @@ public class BankAccountServiceImpl implements BankingOperations {
         return movementRequest;
     }
 
-    private ProductRequest buildProductRequestDeposit(ProductResponse productResponse, double amount) {
+    private ProductRequest buildProductRequestDeposit(ProductDto productResponse, double amount) {
 
         return ProductRequest.builder()
                 .id(productResponse.getId())
@@ -78,11 +78,12 @@ public class BankAccountServiceImpl implements BankingOperations {
                 .balance(productResponse.getBalance() + amount)
                 .limitMnthlyMovements(productResponse.getLimitMnthlyMovements())
                 .dayMovement(productResponse.getDayMovement())
+                .limitCredit(productResponse.getLimitCredit())
                 .clientId(productResponse.getCustomerId())
                 .build();
     }
 
-    private ProductRequest buildProductRequestWithdrawal(ProductResponse productResponse, double amount) {
+    private ProductRequest buildProductRequestWithdrawal(ProductDto productResponse, double amount) {
 
         return ProductRequest.builder()
                 .id(productResponse.getId())
@@ -90,6 +91,7 @@ public class BankAccountServiceImpl implements BankingOperations {
                 .balance(productResponse.getBalance() - amount)
                 .limitMnthlyMovements(productResponse.getLimitMnthlyMovements())
                 .dayMovement(productResponse.getDayMovement())
+                .limitCredit(productResponse.getLimitCredit())
                 .clientId(productResponse.getCustomerId())
                 .build();
     }

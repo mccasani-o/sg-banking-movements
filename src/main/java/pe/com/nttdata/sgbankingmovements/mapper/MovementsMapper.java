@@ -5,6 +5,7 @@ import pe.com.nttdata.sgbankingmovements.model.MovementRequest;
 import pe.com.nttdata.sgbankingmovements.model.MovementResponse;
 import pe.com.nttdata.sgbankingmovements.model.ProductResponse;
 import pe.com.nttdata.sgbankingmovements.model.entity.Movement;
+import pe.com.nttdata.sgbankingmovements.webclient.model.ProductDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class MovementsMapper {
 
-    public Movement toMovement(MovementRequest movementRequest, ProductResponse productResponse) {
+    public Movement toMovement(MovementRequest movementRequest, ProductDto productResponse) {
         return Movement.builder()
                 .movementType(movementRequest.getMovementType().getValue())
                 .amount(movementRequest.getAmount())
@@ -32,7 +33,7 @@ public class MovementsMapper {
         return movementResponse;
     }
 
-    public MovementResponse toMovementResponse(Movement movement, ProductResponse productResponse) {
+    public MovementResponse toMovementResponse(Movement movement, ProductDto productResponse) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
         MovementResponse movementResponse=new MovementResponse();
@@ -40,10 +41,20 @@ public class MovementsMapper {
         movementResponse.setMovementType(movement.getMovementType());
         movementResponse.setAmount(movement.getAmount());
         movementResponse.setDate(movement.getDate().format(formatter));
-        movementResponse.setProduct(productResponse);
+        movementResponse.setProduct(this.buildProductResponse(productResponse));
         return movementResponse;
     }
 
+    public ProductResponse buildProductResponse(ProductDto productDto){
+        ProductResponse response=new ProductResponse();
+        response.setId(productDto.getId());
+        response.productType(productDto.getProductType());
+        response.balance(productDto.getBalance());
+        response.limitMnthlyMovements(productDto.getLimitMnthlyMovements());
+        response.dayMovement(productDto.getDayMovement());
+        response.setCustomerId(productDto.getCustomerId());
+        return response;
+    }
 
 
     public Movement toMovementUpdate(MovementRequest movementRequest, MovementResponse movement) {

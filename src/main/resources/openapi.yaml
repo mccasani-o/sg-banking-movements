@@ -201,7 +201,7 @@ components:
           type: integer
           description: Límite de movimientos mensuales para cuentas de ahorro
         dayMovement:
-          type: integer
+          type: string
           description: Día de movimiento para cuentas a plazo fijo
         customerId:
           type: string

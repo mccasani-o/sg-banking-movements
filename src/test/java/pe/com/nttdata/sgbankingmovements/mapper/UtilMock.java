@@ -23,7 +23,7 @@ public final class UtilMock {
         productResponse.setId("344448");
         productResponse.setProductType("");
         productResponse.setBalance(200.0);
-        productResponse.dayMovement(1);
+        productResponse.dayMovement("");
         productResponse.setLimitMnthlyMovements(1);
         return productResponse;
     }

@@ -3,6 +3,8 @@ package pe.com.nttdata.sgbankingmovements.webclient.model;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 public class ProductDto {
@@ -14,7 +16,7 @@ public class ProductDto {
 
     private Integer limitMnthlyMovements;
 
-    private Integer dayMovement;
-
-    private CustomerDto customer;
+    private String dayMovement;
+    private BigDecimal limitCredit;
+    private String customerId;
 }

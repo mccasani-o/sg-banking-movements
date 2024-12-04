@@ -12,6 +12,7 @@ import pe.com.nttdata.sgbankingmovements.model.ProductResponse;
 import pe.com.nttdata.sgbankingmovements.repository.MovementRepository;
 import pe.com.nttdata.sgbankingmovements.service.MovementService;
 import pe.com.nttdata.sgbankingmovements.webclient.ApiClientProduct;
+import pe.com.nttdata.sgbankingmovements.webclient.model.ProductDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,8 +43,8 @@ public class MovementServiceImpl implements MovementService {
     @Override
     public Flux<MovementResponse> getAll() {
         return this.movementRepository.findAll()
-                .switchIfEmpty(Mono.error(new CustomerException("No se encontró lista de movimiemientos ", "200", HttpStatus.OK)))
-                .flatMap(movement -> this.findByProductId(movement.getProductId()).map(productResponse -> this.movementsMapper.toMovementResponse(movement, productResponse)));
+                .flatMap(movement -> this.findByProductId(movement.getProductId())
+                        .map(productResponse -> this.movementsMapper.toMovementResponse(movement, productResponse)));
 
     }
 
@@ -77,7 +78,7 @@ public class MovementServiceImpl implements MovementService {
 
 
     @CircuitBreaker(name="find-product", fallbackMethod = "getProductFallback")
-    private Mono<ProductResponse> findByProductId(String id){
+    private Mono<ProductDto> findByProductId(String id){
         return this.clientProduct.findByProductId(id);
     }
 

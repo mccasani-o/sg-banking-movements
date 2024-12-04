@@ -26,12 +26,11 @@ public class ApiClientProduct {
         this.webClient = webClientBuilder.baseUrl("http://localhost:8882/api/v1").build();
     }
 
-    public Mono<ProductResponse> findByProductId(String id) {
+    public Mono<ProductDto> findByProductId(String id) {
         return this.webClient.get()
                 .uri("/products/{id}", id)
                 .retrieve()
                 .bodyToMono(ProductDto.class)
-                .map(this::buildProductResponse)
                 .onErrorResume(WebClientResponseException.class, ex -> {
                     if (ex.getStatusCode().is4xxClientError() || ex.getStatusCode().is5xxServerError()) {
                         // Extraer el cuerpo de error y convertirlo a ApiErrorResponse
@@ -76,17 +75,6 @@ public class ApiClientProduct {
             log.error("Error parsing error response: {}", e.getMessage());
             throw new CustomerException("Error parsing error response","400", HttpStatus.BAD_REQUEST);
         }
-    }
-
-    private ProductResponse buildProductResponse(ProductDto productDto) {
-        ProductResponse product=new ProductResponse();
-        product.setId(productDto.getId());
-        product.setProductType(productDto.getProductType());
-        product.setBalance(productDto.getBalance());
-        product.setLimitMnthlyMovements(productDto.getLimitMnthlyMovements());
-        product.setDayMovement(productDto.getDayMovement());
-        product.setCustomerId(productDto.getCustomer().getId());
-        return product;
     }
 
 }
